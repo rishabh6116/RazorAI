@@ -3,7 +3,21 @@ const mongoose = require('mongoose');
 const connectDB = require('../config/db');
 const Product = require('../models/Product');
 
-const img = (seed) => `https://picsum.photos/seed/${encodeURIComponent(seed)}/500/400`;
+// Real, correctly-matching product photos — sourced from the Pexels API by
+// running `node seed/fetchImages.js` once (see that file). This reads the
+// resulting map so every product shows its actual correct photo instead of a
+// random/mismatched stock image.
+const fs = require('fs');
+const path = require('path');
+let imageMap = {};
+try {
+  imageMap = JSON.parse(fs.readFileSync(path.join(__dirname, 'imageMap.json'), 'utf-8'));
+} catch (e) {
+  console.warn('imageMap.json not found — run `node seed/fetchImages.js` first. Using placeholder images for now.');
+}
+function img(seed) {
+  return imageMap[seed] || `https://placehold.co/500x400?text=${encodeURIComponent(seed)}`;
+}
 
 const products = [
   // ---------------- LAPTOPS ----------------
